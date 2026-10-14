@@ -1,0 +1,55 @@
+cmd,driver,mdrv_song_original,mdrv_song_arrange,call_sites,trigger,confidence
+$00,both (stop),,,main@130 main@1e6c task00@3fa8 task26@8d64,STOP all (FM+PCM). Shutdown; end of attract boot; round over (task00 $3fa8); results screen exit (task26 when $578&$40),high
+$01,"PCM (PCMDRV.R, trap #1)",,,task19@7f34,PCM: cancels the locked looping sample $21 (task19 when its counter runs out and $59b==0),high
+$04,"PCM (PCMDRV.R, trap #1)",,,main@2eca main@2fd6,"PCM: menu/name-entry confirm beep (high-score entry, $2fae button wait)",med
+$06,"FM (MDRV.X, trap #0)",$02,$1a,main@30fe,"FM: coin inserted / credit added ($30ee: unmute, wait for FM idle, play, wait)",high
+$07,"FM (MDRV.X, trap #0)",$17,$2f,main@262a,"FM: round BGM, rounds 1-49 ($703 < $31)",high
+$08,"FM (MDRV.X, trap #0)",$04,$1c,main@29b8 task15@7a32,FM: extra life jingle (score extend $29b8; Book of Life $7a22),high
+$09,"FM (MDRV.X, trap #0)",$05,$1d,task14@736c task15@795a,"FM: round BGM restart, rounds 1-49 (task14 $736c; after Glass Potion ends $795a)",high
+$0a,"FM (MDRV.X, trap #0)",$06,$1e,task15@784a,FM: Change Potion music (handler $7846),high
+$0b,"FM (MDRV.X, trap #0)",$07,$1f,task00@411e,"FM: player miss/death jingle (task00 $411e, after death anim; then waits for it to end)",med
+$0c,"FM (MDRV.X, trap #0)",$08,$20,main@214e,FM: round clear jingle (main $214e; skipped when warping via $653 and replaced by ending at round >=100),high
+$0d,"FM (MDRV.X, trap #0)",$09,$21,main@1668,"FM: intermission jingle ($1554, every 7th round and attract; skipped while warping)",high
+$0f,"FM (MDRV.X, trap #0)",$0b,$23,task00@42bc task26@8dd8,"FM: Ptolemy eaten by the Worm (task26 $8dd8, $6f8==4); also task00 $42bc on another death path",med
+$10,"FM (MDRV.X, trap #0)",$0c,$24,main@21e4,"FM: GAME OVER ($21e4, lives reach 0, prints PLAYER< > GAME OVER)",high
+$11,"FM (MDRV.X, trap #0)",$0d,$25,main@2dcc,FM: high-score name entry (BEST 5) music ($2dcc),high
+$12,"FM (MDRV.X, trap #0)",$0e,$26,task24@8708 main@262a,"FM: final round BGM (round $703 >= 100, $262a) / task24 $8708",med
+$13,"FM (MDRV.X, trap #0)",$0f,$27,main@37b0,"FM: ending music ($37b0, before CONGRATULATIONS text)",high
+$14,"FM (MDRV.X, trap #0)",$10,$28,main@1e24 task14@7166,"FM: boot/title jingle ($1e24, waited on) / task14 $7166 timer warning (hurry?)",med
+$15,"FM (MDRV.X, trap #0)",$11,$29,task14@72c8,FM: task14 $72c8 (hurry stage 2? sets $61d=$ff),low
+$16,"PCM (PCMDRV.R, trap #1)",,,task01@4604 task2d@9ba8,PCM: player action (task01 $4604 when $62f set) / task2d,low
+$17,"PCM (PCMDRV.R, trap #1)",,,task03@4a12,PCM: task03 $4a12 (player magic shot?),low
+$18,"PCM (PCMDRV.R, trap #1)",,,task15@7762,PCM: bonus item appears (task15 $7762),med
+$19,"PCM (PCMDRV.R, trap #1)",,,task0c@5bf6,"PCM: enemy family (task05-0c body) $5bf6, spawns a sub-task",low
+$1a,"PCM (PCMDRV.R, trap #1)",,,task00@406c,"PCM: player touched by enemy (task00 $406c, distance <16 -> kill all tasks)",med
+$1b,"PCM (PCMDRV.R, trap #1)",,,task0c@5f6e,PCM: enemy body $5f6e (when $654==0),low
+$1c,"PCM (PCMDRV.R, trap #1)",,,task0c@5ca6,PCM: enemy body $5ca6 (object type $17/$1b),low
+$1d,"PCM (PCMDRV.R, trap #1)",,,task17@7c62,PCM: task17 $7c62 (proximity test <11 px),low
+$1e,"PCM (PCMDRV.R, trap #1)",,,task03@4b06 task0c@5d2e task16@7be6,"PCM: shared helper $7be4 (also task03 $4b06, enemy body $5d2e) - spawn/pop effect?",low
+$20,"PCM (PCMDRV.R, trap #1)",,,task00@427a,PCM: task00 $427a post-death sequence,low
+$21,"PCM (PCMDRV.R, trap #1)",,,task19@7ec2,PCM: LOCKED LOOPING sample: while active only cmd $01 can interrupt; re-triggered every frame by $574 (PCM status $fd != $21). Started by task19 $7ec2,high
+$22,"PCM (PCMDRV.R, trap #1)",,,task16@7ba0,PCM: task16 $7ba0 (resets player state $634/$62d/$62c),low
+$24,"PCM (PCMDRV.R, trap #1)",,,task0c@5edc,PCM: enemy body $5edc,low
+$25,"PCM (PCMDRV.R, trap #1)",,,task04@4eae task24@88a4,PCM: task04 $4eae / task24 $88a4,low
+$26,"PCM (PCMDRV.R, trap #1)",,,task0f@67c0,PCM: task0f $67c0 (object type $1c),low
+$27,"PCM (PCMDRV.R, trap #1)",,,task15@7642,PCM: bonus item collected (task15 $7642),high
+$28,"PCM (PCMDRV.R, trap #1)",,,task11@6cfc task1c@82d4,PCM: task11 $6cfc / task1c $82d4 (object state $e0 -> $e1),low
+$2a,"PCM (PCMDRV.R, trap #1)",,,task00@40d0,PCM: task00 $40d0 death animation start,low
+$2b,"PCM (PCMDRV.R, trap #1)",,,task15@7b30,PCM: Mystical Feather warp: rounds skipped (sets $653),high
+$2c,"PCM (PCMDRV.R, trap #1)",,,task15@7afa,"PCM: Mystical Feather collected (warp item, handler $7af6)",high
+$2d,"PCM (PCMDRV.R, trap #1)",,,task15@7a40,PCM: Book of Death collected (handler $7a3c),high
+$2e,"PCM (PCMDRV.R, trap #1)",,,task15@78c6,PCM: task15 $78c6 (item proximity <14),low
+$2f,"PCM (PCMDRV.R, trap #1)",,,task11@6d4c,PCM: task11 $6d4c,low
+$30,"FM (MDRV.X, trap #0)",$18,$30,main@262a,"FM: round BGM, rounds 50-99",high
+$31,"FM (MDRV.X, trap #0)",$13,$2b,task14@736c task15@795a,"FM: round BGM restart, rounds 50-99 (pair of $09)",med
+$32,"PCM (PCMDRV.R, trap #1)",,,task26@8c80,"PCM: WORM emerges from its door (task26 $8c80, only if enemies remain)",high
+$33,"PCM (PCMDRV.R, trap #1)",,,task1c@8390 task1c@83c6,PCM: task1c $8390/$83c6,low
+$34,"PCM (PCMDRV.R, trap #1)",,,task1c@8206 task1c@84c2,PCM: task1c $8206/$84c2,low
+$35,"PCM (PCMDRV.R, trap #1)",,,task21@9138,PCM: task21 $9138 (many-actor scene),low
+$36,"PCM (PCMDRV.R, trap #1)",,,task21@91c4,PCM: task21 $91c4,low
+$37,"PCM (PCMDRV.R, trap #1)",,,task21@91e0,PCM: task21 $91e0,low
+$38,"FM (MDRV.X, trap #0)",$14,$2c,task2c@99c0,FM: task2c $99c0,low
+$39,"PCM (PCMDRV.R, trap #1)",,,task29@9614,PCM: task29 $9614,low
+$3f,"FM (MDRV.X, trap #0)",$15,$2d,task14@7274,FM: task14 $7274 (after waiting for FM idle),low
+$ee,-,,,main@1e78,MUTE: stop FM+PCM and ignore all further commands until $ef (attract mode is silent),high
+$ef,-,,,main@1e16 main@1f90 main@30f2,UNMUTE (game start / coin),high

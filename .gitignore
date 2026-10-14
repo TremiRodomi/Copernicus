@@ -1,0 +1,46 @@
+img*/
+fl_files/
+*.hdm
+*.dim
+*.X
+*.DAT
+*.asm
+*.zip
+*.dec
+*.bin
+*.png
+*.bak
+# DragonRuby SDK is the user's licensed download: track only our game folder inside it
+dragonruby-linux-amd64/*
+!dragonruby-linux-amd64/fairyland/
+dragonruby-linux-amd64/fairyland/data/*
+!dragonruby-linux-amd64/fairyland/data/README.txt
+dragonruby-linux-amd64/fairyland/*.txt
+__pycache__/
+# audio is bundled with release binaries only, never committed (players supply only their ROM / disk)
+dragonruby-linux-amd64/fairyland/audio/*
+!dragonruby-linux-amd64/fairyland/audio/README.md
+*.ogg
+*.wav
+*.flac
+# player border pictures (GRAPHICS > BORDER > IMAGE): the player's own files, never committed
+dragonruby-linux-amd64/fairyland/borders/*
+!dragonruby-linux-amd64/fairyland/borders/README.txt
+# X68000 soundtrack rip (VGM) and other music sources: copyrighted, local only
+The_FairyLand_Story_(Sharp_X68000)/
+*.vgz
+*.vgm
+*.m3u
+# third-party files that are not ours to publish (MAME cheat file)
+flstory.xml
+# DragonRuby's generated error folder, Claude Code's local settings
+dragonruby-linux-amd64/fairyland/errors/
+.claude/
+# Switch / PS4 game packages, console keys and anything extracted from them: local only
+*.nsp
+*.xci
+*.nca
+*.pkg
+*.keys
+*.URL
+AA-*/

@@ -1,0 +1,66 @@
+{
+ "2:d4": {
+  "pal": 13
+ },
+ "2:db": {
+  "pal": 8
+ },
+ "0:1c": {
+  "pal": 3,
+  "name": "Dracolisk"
+ },
+ "0:1b": {
+  "pal": 3,
+  "name": "Dracolisk"
+ },
+ "0:1a": {
+  "name": "Dracolisk",
+  "pal": 3
+ },
+ "0:19": {
+  "pal": 3,
+  "name": "Dracolisk"
+ },
+ "0:1d": {
+  "name": "Dracolisk",
+  "pal": 3
+ },
+ "0:1e": {
+  "pal": 3,
+  "name": "Dracolisk"
+ },
+ "0:1f": {
+  "pal": 3,
+  "name": "Dracolisk"
+ },
+ "1:3d": {
+  "pal": 1
+ },
+ "2:c5": {
+  "pal": 1,
+  "name": "Ending Bonus Text"
+ },
+ "2:c6": {
+  "pal": 1,
+  "name": "Ending Bonus Text"
+ },
+ "2:c7": {
+  "pal": 1,
+  "name": "Ending Bonus Text"
+ },
+ "2:c8": {
+  "name": "Ending Bonus Text",
+  "pal": 1
+ },
+ "2:c9": {
+  "name": "Ending Bonus Text",
+  "pal": 1
+ },
+ "2:ca": {
+  "pal": 3,
+  "name": "Ending Bonus Text - this is supposed to flash between colors"
+ },
+ "2:cb": {
+  "name": "Ending Bonus Text - this is supposed to flash between colors"
+ }
+}
