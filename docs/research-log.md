@@ -1819,7 +1819,7 @@ the same scan applies to any uncompressed file holding the ROMs (to check when t
 ## 1.0 release prep (pass 60, 2026-10-14)
 - Defaults: MUSIC VOLUME 4 -> 3 (SFX stays 10), the user's new balance; the mix may still need per-set gain work.
 - New icon from the user (a 15x16 pixel-art cake at x25, transparent): make_icon.py now also takes a PNG, recovers the
-  pixel grid (gcd of the colour-run starts) and builds icon / icon_ios / icon_large on the navy background as before.
+  pixel grid (gcd of the colour-run starts) and builds icon / icon_ios / icon_large, now on a TRANSPARENT background (user; --bg = the old navy, RGB).
 - metadata version 0.1 -> 1.0. Dev outputs removed from the game folder (shot_*.png, script_end.png, objlog / tasklog /
   scenes / winseq / check_script, errors/) and the __pycache__ folders.
 - NOTES section 8 split into research questions and the user's post-1.0 to-dos (PS4 Arcade Archives, audio balance,
