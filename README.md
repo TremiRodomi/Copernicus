@@ -151,8 +151,7 @@
   - Disk 2 (the save disk) isn't needed: Copernicus keeps its own saves and settings.
 
   ## Building from source
-  [Short version: DragonRuby 7.23, put `fairyland/` in the SDK folder, run `./dragonruby fairyland`.
-  Link to docs/ for the research notes if you want people to read them.]
+  Short version: DragonRuby 7.23, put `fairyland/` in the SDK folder, run `./dragonruby fairyland`.
 
   ## Legal
   The Fairyland Story is © Taito Corporation / Square Enix. Copernicus is an unofficial fan project,
