@@ -272,12 +272,14 @@ module Widgets
 
   # the round timer as a bar (user): full when Horned comes ($46), the mark is the hurry-up time ($41). Text only as a
   # warning: HURRY UP! from $41 until Horned shows, LAST ENEMY REMAINING while the last enemy's escape timer runs (it
-  # restarts at $32 / $40 and the same bar runs to the escape at $46).
+  # restarts at $32 / $40 and the same bar runs to the escape at $46). Once the round is over (cleared, or the last enemy
+  # escapes) the bar stops and reads ROUND ENDED.
   def self.widget_timer(args, x, y, u)
     w = @w
     return widget_drac(args, x, y, u, w[:drac]) if w[:drac] # round 101: no timer, the boss's health instead
-    t = w[:t610]
-    text = if w[:enemies_left] & 0x80 != 0 then narrow? ? 'LAST ENEMY LEFT' : 'LAST ENEMY REMAINING'
+    t = w[:timer_end] || w[:t610]
+    text = if w[:timer_end] then 'ROUND ENDED' # cleared, or the last enemy escaped: the bar stops
+           elsif w[:enemies_left] & 0x80 != 0 then narrow? ? 'LAST ENEMY LEFT' : 'LAST ENEMY REMAINING'
            elsif w[:t611] == 0 && t >= 0x41 then 'HURRY UP!'
            end
     barv = [[t, 0x46].min, 0x46, [255, 110, 96], 0x41]

@@ -24,7 +24,7 @@ module MenuTask
   CURSOR = 0x5b
   MAIN = [['ARCADE START', 'HISCORE & PROGRESS SAVED'], ['CASUAL START', 'ONLY PROGRESS SAVED'],
           ['GAME OPTIONS', ''], ['QUIT GAME', '']].freeze
-  LABELS = { round: 'ROUND', lives: 'LIVES', behaviour: 'BEHAVIOUR', music: 'MUSIC', short_hop: 'SHORT HOP',
+  LABELS = { round: 'ROUND', lives: 'LIVES', behaviour: 'BEHAVIOUR', music: 'MUSIC', short_hop: 'EASY SHORT HOP',
              colours: 'COLOURS', widgets: 'SHOW', music_volume: 'MUSIC VOLUME', sfx_volume: 'SFX VOLUME', boot_screen: 'BOOT SCREEN', sfx_filter: 'SFX FILTER',
              graphics: 'GRAPHICS', fullscreen: 'FULLSCREEN', window: 'WINDOW', scale: 'SCALE', aspect: 'ASPECT',
              smooth: 'SMOOTH', scanlines: 'SCANLINES', mask: 'MASK', mask_level: 'MASK LEVEL', vignette: 'VIGNETTE',

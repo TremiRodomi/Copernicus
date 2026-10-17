@@ -42,6 +42,7 @@ module World
       mode626: 0,                  # $626: Glass Potion invincibility ($80); bit 0 flips every frame = Ptolemy hidden ($1d4e)
       cake_x: 0, cake_y: 0,        # $60d / $60e AI target beside a cake
       t60f: 6, t610: 1, t611: 0,   # task 04 round timer
+      timer_end: nil,              # (port) the round timer when the round ended - clear or last enemy's escape (widget)
       shot: { active: 0, x: 0, y: 0, step: 0 }, # $598-$59a, $59c Ptolemy's spell ($598: $ff flying, $80 spent on a hit)
       spell_delay: 0,              # $597 recast delay while the button is held
       mode593: 0,                  # $593 background animation mode (also task 0e's rate)

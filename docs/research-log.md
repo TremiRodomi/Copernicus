@@ -1851,3 +1851,13 @@ the same scan applies to any uncompressed file holding the ROMs (to check when t
   "EXP 39 NEXT AT 29" with a full bar. It now shows max($706, EXP) + 1 (round 40: EXP 39 NEXT AT 40, the next gain
   levels up), and MAX LEVEL (full bar) once EXP can no longer level up. The level is shown 1-based like the TCRF
   notes (user): LEVEL 1 at the start, 8 = the EXP cap, 9 = Holy Water.
+
+## 1.01.1: HORNED TIMER stops at the round's end, EASY SHORT HOP, LOSE A LIFE only in play (pass 62, 2026-10-17)
+- HORNED TIMER (user: it kept counting after the round ended): the clear ($20ba, main.rb) and the last enemy's escape
+  (task 04 timers, $4e7c) save the round timer in w[:timer_end] (port-only, rewound with the world). From then on the
+  widget's bar stays at that value and reads ROUND ENDED. A clear while Horned is out removes Horned, so the timer has
+  nothing left to count toward. Checked: round 1, one enemy left, --no_hit: LAST ENEMY REMAINING, then ROUND ENDED
+  at the escape with the bar stopped.
+- CASUAL menu: SHORT HOP is now EASY SHORT HOP (user: makes it clearer that it's an assist).
+- Pause > LOSE A LIFE (CASUAL): only while Ptolemy is in play (Pause.playing?: the director runs, end_code 0, no clear
+  or escape under way, enemies left). It used to show from READY on and wait for play to start.

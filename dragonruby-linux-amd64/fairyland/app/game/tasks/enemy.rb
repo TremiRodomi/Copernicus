@@ -416,6 +416,7 @@ module EnemyAI
       end
       return
     end
+    w[:timer_end] ||= w[:t610] # (port: the HORNED TIMER widget stops here)
     w[:obj].each do |o| # $4e7c: time is up with one enemy left: it escapes
       st = o[Obj::ST]
       next if st == 0 || (st >= 0x80 && st != 0xf0) || st == 0x30

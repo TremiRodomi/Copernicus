@@ -17,7 +17,7 @@ devid=copernicus
 devtitle=Copernicus Port
 gameid=copernicus
 gametitle=Copernicus
-version=1.01
+version=1.01.1
 icon=metadata/icon.png
 
 # ==============================================

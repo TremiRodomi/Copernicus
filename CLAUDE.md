@@ -53,9 +53,9 @@ The whole game is ported and playable from either the arcade ROMs or the X68000 
 Dracolisk, ending, intermissions, game over / name entry / continue, title + attract, coin-up menu, ARCADE / CASUAL modes, pause,
 widgets, graphics options, audio sets, controls + rebinding, release builds). Verified frame by frame against MAME (arcade and x68000)
 for the demos, rounds 12/43/87, the moon, Horned and the Dracolisk fight. Details: NOTES.md; history: docs/research-log.md.
-Version 1.01 (2026-10-17; 1.0 2026-10-14). Open items + user TODOs: NOTES.md section 8 (PS4 Arcade Archives source, audio balance, graphics review
+Version 1.01.1 (2026-10-17; 1.01 2026-10-17, 1.0 2026-10-14). Open items + user TODOs: NOTES.md section 8 (PS4 Arcade Archives source, audio balance, graphics review
 + new features, input latency) and docs/VERSIONS.md "Still open".
-Code licence: MIT (LICENSE). Repo: https://github.com/TremiRodomi/Copernicus (branch main, tags v1.0, v1.01).
+Code licence: MIT (LICENSE). Repo: https://github.com/TremiRodomi/Copernicus (branch main, tags v1.0, v1.01, v1.01.1).
 - Sound: NOT emulating the sound hardware. Canned audio is bundled in release binaries only (never in git): arcade OST + both X68 OSTs
   (ORIGINAL/ARRANGE) + MAME-recorded arcade effects. audio/<set>/<cmd hex> name.ogg, music/tracks.txt; files must be 44.1 kHz stereo.
 - DATA SOURCES (decided): the build must run fully from EITHER the X68000 Disk 1 OR the arcade ROM set (identified by CRC32; MCU required).

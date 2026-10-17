@@ -1,7 +1,7 @@
 # Pause (user design, from the X68000 version's ESC pause - $27c: ESC freezes everything until pressed again, no text):
 # Esc / P during a game freezes it and opens a small menu in the game's font on a black box, drawn on its own layer over
 # the screen: CONTINUE, LOSE A LIFE (CASUAL only - the X68000's F1 key, $2268: $62e = $40, no killer $596 = $ff - for
-# getting out of a stuck spot; shown during every round, and if play has not started yet (READY) it waits for it),
+# getting out of a stuck spot; only while Ptolemy is in play - not at READY, nor once the round is ending),
 # QUIT TO MENU (back to the coin-up menu; CASUAL records the round reached first).
 module Pause
   BOX = [7, 11, 18, 8].freeze # col, row, width, height (cells)
@@ -15,11 +15,18 @@ module Pause
     !s.attract && !s.menu && !s.script && !s.shot && !s.world[:tasks].any? { |t| t && OVER.include?(t[:id]) }
   end
 
+  # LOSE A LIFE only while Ptolemy is in play (user): the director runs (not READY / an intermission) and the round is
+  # not ending (no clear, escape or death under way)
+  def self.playing?(w)
+    w[:round_world] && w[:end_code] == 0 && !w[:clearing] && !w[:timer_end] && (w[:enemies_left] & 0x7f) != 0 &&
+      w[:tasks].any? { |t| t && t[:id] == 0 }
+  end
+
   def self.open(args)
     s = args.state
     w = s.world
     rows = [:continue]
-    rows << :give_up if s.settings[:mode] == :casual && w[:round_world]
+    rows << :give_up if s.settings[:mode] == :casual && playing?(w)
     rows << :quit
     s.pause = { rows: rows, sel: 0, prev: 0xff }
     Audio.pause(args, true)

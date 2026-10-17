@@ -611,6 +611,7 @@ def tick(args)
   # $20ba: every enemy gone -> the clear sequence (only once the director runs, i.e. after the intro)
   if w[:end_code] == 0 && !w[:clearing] && !w[:demo_script] && (w[:enemies_left] & 0x7f) == 0 && w[:tasks].any? { |t| t && t[:id] == 0 }
     w[:clearing] = true
+    w[:timer_end] ||= w[:t610] # (the HORNED TIMER widget stops here)
     Scheduler.spawn(w, 0x41)
   end
   Score.extend_check(w) unless s.attract || s.menu || w[:hud_off] || w[:input_override] # $2976: gameplay loop only
