@@ -1824,3 +1824,30 @@ the same scan applies to any uncompressed file holding the ROMs (to check when t
   scenes / winseq / check_script, errors/) and the __pycache__ folders.
 - NOTES section 8 split into research questions and the user's post-1.0 to-dos (PS4 Arcade Archives, audio balance,
   graphics review + features, input latency, licence).
+
+## Post-1.0 fixes: widgets under 4:3 + FIT, round-1 music stutter, optimization, level widget (pass 61, 2026-10-17)
+- WIDGETS BLURRY (user: 4:3 and FIT, almost unreadable): 4:3 + FIT leaves a 160 px border, so the font pixel came out
+  fractional (u = 0.88 logical px). The 1280 x 720 texel layer (pass 52) drew each 8x8 glyph into ~7 texels NEAREST
+  (rows and columns of the font dropped), then scaled it linear (1.5x at 1080p). Widgets.layout now gives the layer
+  f = s / u texels per logical px, where s = the whole screen px in u (at least 1), so a font pixel is always s whole
+  texels; positions are snapped to the layer's texels. The linear scale to the window is the leftover fraction
+  (the SHARP idea). With a whole u at 720p - 1080p, f = 1: the pass 52 layer, unchanged. A whole u at a higher render
+  scale (u 2 at 1.5: 3 texels) is now crisp too. Both sides share one size (the narrower border's).
+- ROUND-1 MUSIC STUTTER (user: Linux and the user's dad's Windows PC): the first start of a BGM loop took 58-60 ms
+  (3-4 frames) - DragonRuby decodes an OGG in full on its first play (and keeps it: why later rounds were smooth;
+  the pass 40 memory steps). Audio.warm plays every music file of the set (plus the arcade fallbacks, SFX FILTER
+  variant) at gain 0 at boot and when the set or filter changes, and drops them the tick after (warm_done). Boot
+  frame unchanged (~88 ms); RSS +37 MB (arcade set, 135 -> 172 MB). No frame over 20 ms after it in round 1, any set.
+- OPTIMIZATION (measured with throwaway tick timers, not kept): gameplay was already ~1.5-2 ms of Ruby per tick (all
+  filters on: 1.9), wall 16.67 ms, no dropped frames. The one real hitch: Screen.render (full redraw of 1024 cells) took
+  22 ms at every round start = a dropped frame at each round clear. Cells are now decoded once per tile + attr per
+  Screen.setup (cell_rows) and copied 8 px rows at a time: 8.5 ms, no dropped frame on a real round clear; --soak 60
+  slow frames 148 -> 13 (left: the soak's jump, which builds a round in one tick). --shot 1/12/43/87/101, arcade and
+  --x68k 1: pixel-identical to before. Widgets.frame is the biggest steady cost (0.65 ms/frame): left as is.
+- LEVEL WIDGET vs the rank (user question: does the level drop on a hit?): checked against FS.X. $1fd8 (every new
+  life) sets EXP $57f = round - 1 and the threshold $706 = $1d but does NOT touch the level $705. Only a Wraith kill
+  costs a level; the Wizard's shrink costs 10 EXP. $6854 levels up when a gain takes EXP PAST $706, one level per gain,
+  not past 7, and not once $706 + 30 > $ff. The widget showed NEXT AT $706 (one short), and after a death late in the game
+  "EXP 39 NEXT AT 29" with a full bar. It now shows max($706, EXP) + 1 (round 40: EXP 39 NEXT AT 40, the next gain
+  levels up), and MAX LEVEL (full bar) once EXP can no longer level up. The level is shown 1-based like the TCRF
+  notes (user): LEVEL 1 at the start, 8 = the EXP cap, 9 = Holy Water.

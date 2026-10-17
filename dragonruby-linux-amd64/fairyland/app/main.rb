@@ -152,6 +152,7 @@ def boot(args)
   s.settings[:behaviour] = :x68000 if cli[:x68k] # where the two versions differ, play like the arcade or the X68000
   s.settings[:colours] = :pcb if cli[:colours] == 'pcb'
   s.settings[:music] = cli[:music].to_sym if %w[arcade original arrange].include?(cli[:music]) # dev: --music original
+  Audio.warm(args, s.settings[:music])
   s.settings.merge!(no_hit: !cli[:no_hit].nil?,
                  pos: cli[:pos] && cli[:pos].split(',').map { |v| v.to_i(16) }, # dev: --pos e0,aa
                  drac_dead: !cli[:drac_dead].nil?,
@@ -372,6 +373,7 @@ def apply_settings(args)
   %i[behaviour colours music widgets music_volume sfx_volume sfx_filter].each { |k| s.settings[k] = s.prefs[k] }
   Audio.volumes(args, s.prefs[:music_volume], s.prefs[:sfx_volume])
   Audio.filter = s.prefs[:sfx_filter]
+  Audio.warm(args, s.settings[:music])
   s.gd.behaviour = s.settings[:behaviour]
   Palette.profile = s.settings[:colours]
   Screen.setup(s.gd, s.builder)
@@ -516,6 +518,7 @@ end
 def tick(args)
   s = args.state
   boot(args) if Kernel.tick_count == 0
+  Audio.warm_done(args)
   dev_winseq(args) if s.winseq
   args.outputs.background_color = [16, 16, 24]
   if s.error

@@ -24,6 +24,7 @@ module Screen
       @pal[2 * i + 1] = c
     end
     @half = rb.bg_half * 0x10000
+    @cells = {} # (cell_rows: decoded for this palette and half)
   end
 
   # DragonRuby discards args.pixel_array objects after every tick (Runtime#clear_draw_passes); the uploaded texture stays.
@@ -125,24 +126,38 @@ module Screen
     end
   end
 
+  # a cell is copied row by row from its decoded pixels (colour and front layer), decoded once per tile + attr until
+  # the next setup: a full redraw at a round start took 22 ms (a dropped frame), mostly the per-pixel lookups
   def self.draw_cell(px, i, tile, attr)
-    bg = @gd.bgchr
-    src = @half + ((attr & 0xc0) << 8) + tile * 64
-    hflip = attr & 8 == 0
-    vflip = attr & 0x10 == 0
-    odd = attr & 0x20 != 0
-    base = (attr & 7) * 32
+    rows = cell_rows(tile, attr)
     cx = (i & 31) * 8
     cy = (i >> 5) * 8
     8.times do |y|
-      row = src + 8 * (vflip ? 7 - y : y)
       sy = cy + y
       o = (ROWS_TOP_DOWN ? sy : 255 - sy) * 256 + cx
-      8.times do |x|
-        v = bg[row + (hflip ? 7 - x : x)]
-        c = @pal[base | (v << 1) | (odd && v != 0 ? 1 : 0)]
-        px[o + x] = c
-        @front[o + x] = odd && v != 0 ? c : 0
+      c, f = rows[y]
+      px[o, 8] = c
+      @front[o, 8] = f
+    end
+  end
+
+  # [[8 colours, 8 front-layer colours] per row, top down] for a tile + attr in this setup's palette and BGCHR half
+  def self.cell_rows(tile, attr)
+    @cells[(attr << 16) | tile] ||= begin
+      bg = @gd.bgchr
+      src = @half + ((attr & 0xc0) << 8) + tile * 64
+      hflip = attr & 8 == 0
+      vflip = attr & 0x10 == 0
+      odd = attr & 0x20 != 0
+      base = (attr & 7) * 32
+      Array.new(8) do |y|
+        row = src + 8 * (vflip ? 7 - y : y)
+        c = Array.new(8) do |x|
+          v = bg[row + (hflip ? 7 - x : x)]
+          @pal[base | (v << 1) | (odd && v != 0 ? 1 : 0)]
+        end
+        f = Array.new(8) { |x| odd && bg[row + (hflip ? 7 - x : x)] != 0 ? c[x] : 0 }
+        [c, f]
       end
     end
   end

@@ -233,6 +233,29 @@ module Audio
     m[:left] = step[1] && step[1].idiv(SAMPLES_PER_FRAME)
   end
 
+  # DragonRuby decodes a sound file in full the first time it is played (and keeps it for the session), on the main
+  # thread: 60 ms for a ~40 s BGM loop, dropped frames the first time a round's music reaches its loop (user report:
+  # round 1, Linux and Windows). So every music file of the set is played once silently at boot / when the set or the
+  # SFX FILTER changes (one long frame there instead), and dropped the frame after (warm_done).
+  def self.warm(args, music_set)
+    key = [music_set.to_s, filter]
+    return if @warmed == key
+    scan unless @tracks
+    files = (@tracks['arcade'].keys | (@tracks[music_set.to_s] || {}).keys).flat_map do |cmd|
+      music_steps(cmd, music_set).map { |step| variant(step[0]) }
+    end
+    files.uniq.each_with_index { |f, i| args.audio[:"warm_#{i}"] = { input: f, gain: 0.0, looping: false } }
+    @warm_n = files.uniq.size
+    @warm_tick = Kernel.tick_count
+    @warmed = key
+  end
+
+  def self.warm_done(args)
+    return unless @warm_n && Kernel.tick_count > @warm_tick
+    @warm_n.times { |i| args.audio.delete(:"warm_#{i}") }
+    @warm_n = nil
+  end
+
   # GAME OPTIONS volume changed: apply to what is playing
   def self.volumes(args, music, sfx)
     self.music_gain = music / 10.0

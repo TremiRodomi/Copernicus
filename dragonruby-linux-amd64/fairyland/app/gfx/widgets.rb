@@ -1,6 +1,6 @@
 # Optional info panels in the side borders (GAME OPTIONS > WIDGETS; user idea, in the style of M2's arcade ports). They
 # only read the game state, never change it. Panels:
-#   LEVEL   the level ($705) and EXP ($57f) towards the next level threshold ($706)
+#   LEVEL   the level ($705 + 1: levels 1-9) and EXP ($57f) towards the next level threshold ($706)
 #   BONUS ITEM  the walking counter ($3f0e: every 800 px walked an item appears) and the items that can come now with
 #           their odds - $7534: group by enemies left ($c902), tier by a roll & $7f against the EXP bracket's odds ($c8de)
 #   HORNED TIMER  the round timer ($610, task 04) as a bar: hurry-up mark at $41, full = Horned ($46); with one enemy
@@ -12,9 +12,10 @@
 # Look: the game's own 8x8 font (BG characters $20-$5f of the player's data, made white and tinted), the item sprites as
 # icons. Size: a panel is COLS (or NARROW) characters wide; its font pixel is a whole number of LOGICAL (720p) pixels, the
 # largest that fits the border beside the playfield, so the panels keep the same share of the screen at every resolution
-# (user: they shrank at 1080p when sized in whole screen pixels). They are drawn sharp into a 1280 x 720 texel layer,
-# then the layer is scaled to the window LINEAR (user, pass 52: even at 1.5x, where nearest made some font pixels 1
-# screen px and some 2; other choices kept in NOTES pass 52). They never cover the game.
+# (user: they shrank at 1080p when sized in whole screen pixels). They are drawn sharp into a layer where a font pixel is
+# a whole number of texels (layout: 1280 x 720 at 720p - 1080p), then the layer is scaled to the window LINEAR (user,
+# pass 52: even at 1.5x, where nearest made some font pixels 1 screen px and some 2; other choices kept in NOTES pass
+# 52; pass 61: a fractional font pixel under 4:3 + FIT). They never cover the game.
 # Layout (user): each panel OFF or in one of four corners of the side borders (settings widget_*). The panels of one
 # corner stack in PANELS order (= the menu's): top corners from the top down, bottom corners the same way but the
 # whole stack sits on the bottom edge.
@@ -111,15 +112,18 @@ module Widgets
     @w = w
     @g = g
     @np = np
+    lay = layout(args, rect)
+    return unless lay
+    f = lay[:f]
     [[:widget_layer, PANELS - [:widget_music], alpha], [:widget_music_layer, [:widget_music], music_alpha]].each do |path, keys, a|
       next if a <= 0
       @only = keys
-      @out = Display.target(args, path, 1280, 720)
-      panels(args, rect)
+      @out = Display.target(args, path, (1280 * f).ceil, (720 * f).ceil)
+      panels(args, lay)
       next if @out.sprites.empty?
       Display.texels(args, @out.sprites)
       args.outputs.sprites << { x: 0, y: 0, w: 1280, h: 720, path: path, scale_quality_enum: 1, a: (255 * a).round }
-                              .merge(Display.src(args, 0, 0, 1280, 720))
+                              .merge(Display.src(args, 0, 0, 1280 * f, 720 * f))
     end
   end
 
@@ -146,34 +150,51 @@ module Widgets
                             .merge(Display.src(args, 0, 0, 1280, 720))
   end
 
-  # the panels in the layer's texels (= 720p logical pixels)
-  def self.panels(args, rect)
+  # The font pixel size and the layer's texel density. u (logical px per font pixel) is whole when the border allows,
+  # else a fraction (4:3 + FIT: 0.88). The layer has f texels per logical px, so that a font pixel is a whole number
+  # of texels: s = the whole screen pixels in u (at least 1), f = s / u. With a whole u at 720p - 1080p this is the
+  # 720p layer of pass 52 (f = 1); a fractional u drew its font at 0.88 texels nearest (rows and columns of the glyphs
+  # dropped), then the blur (user report: unreadable under 4:3 + FIT). Now the font is always whole, and the layer's
+  # linear scale to the window is the fraction left (the SHARP idea, as for the playfield). Both sides share one size.
+  def self.layout(args, rect)
     s = args.state
-    font(args)
     px, py, pw, ph = rect
     fp = Display.frame_pad(s.prefs)
     px -= fp
     pw += 2 * fp
-    left_w = px
-    right_w = 1280 - px - pw
+    avail = [px, 1280 - px - pw].min
+    wide = fit(avail - 16, COLS)
+    slim = fit(avail - 16, NARROW)
+    cols, u = slim > wide ? [NARROW, slim] : [COLS, wide] # (a tie: wide; mruby arrays have no <=>)
+    return nil if u < 0.6
+    k = [(u * Display.render_scale(args) + 1e-6).floor, 1].max
+    { px: px, pw: pw, cols: cols, u: k, f: k / u }
+  end
+
+  # the panels in the layer's texels (f per logical pixel; u = texels per font pixel, whole)
+  def self.panels(args, lay)
+    s = args.state
+    font(args)
+    f = lay[:f]
+    u = lay[:u]
+    @cols = lay[:cols]
+    px = lay[:px] * f
+    pw = lay[:pw] * f
+    sw = 1280 * f
     areas = Hash.new { |h, k| h[k] = [] }
     PANELS.each do |key|
       slot = s.prefs[key] || :off
       areas[slot] << key unless slot == :off
     end
+    margin = (MARGIN * f).round
     %i[left right].each do |side|
       tops = areas[:"top_#{side}"]
       bottoms = areas[:"bottom_#{side}"]
       next if tops.empty? && bottoms.empty?
-      avail = side == :left ? left_w : right_w
-      wide = fit(avail - 16, COLS)
-      slim = fit(avail - 16, NARROW)
-      @cols, u = slim > wide ? [NARROW, slim] : [COLS, wide] # (a tie: wide; mruby arrays have no <=>)
-      next if u < 0.6
       pw_l = units(@cols) * u
-      x0 = side == :left ? px - pw_l - ((px - pw_l) / 2).floor : px + pw + ((1280 - px - pw - pw_l) / 2).floor
-      stack(args, tops, x0, 720 - MARGIN, u)
-      stack(args, bottoms, x0, MARGIN + stack(args, bottoms, x0, 0, u, true), u) unless bottoms.empty?
+      x0 = (side == :left ? px - pw_l - (px - pw_l) / 2 : px + pw + (sw - px - pw - pw_l) / 2).floor
+      stack(args, tops, x0, (720 * f).floor - margin, u)
+      stack(args, bottoms, x0, margin + stack(args, bottoms, x0, 0, u, true), u) unless bottoms.empty?
     end
   end
 
@@ -206,12 +227,23 @@ module Widgets
   end
 
   # ---- panels: each draws itself with its top at y and returns its bottom ----
+  # $6854 levels up when a gain takes EXP PAST $706 (so at $706 + 1), one level per gain, never past 7 by EXP, and not
+  # once $706 + 30 would pass $ff. A new life puts EXP at round - 1 but $706 back to $1d ($1fd8) and keeps the level:
+  # late in the game EXP is then already past it, and each gain is a level up until $706 catches up (user question)
   def self.widget_level(args, x, y, u)
     g = @g
+    exp = g[:exp]
+    maxed = g[:level] >= 7 || g[:exp_next] + 0x1e > 0xff
+    at = [g[:exp_next], exp].max + 1
     panel(args, x, y, u, 'LEVEL', 3.5) do |l|
-      l.call(0, "LEVEL #{g[:level]}", INK)
-      l.call(1, narrow? ? "EXP #{g[:exp]}  NEXT #{g[:exp_next]}" : "EXP #{g[:exp]}   NEXT AT #{g[:exp_next]}", DIM)
-      l.call(2.5, nil, nil, [g[:exp], g[:exp_next], [110, 190, 255]])
+      l.call(0, "LEVEL #{g[:level] + 1}", INK) # (1-8 by EXP, 9 with Holy Water: $705 is 0-based, TCRF numbering)
+      if maxed
+        l.call(1, narrow? ? "EXP #{exp}  MAX" : "EXP #{exp}   MAX LEVEL", DIM)
+        l.call(2.5, nil, nil, [1, 1, [110, 190, 255]])
+      else
+        l.call(1, narrow? ? "EXP #{exp}  NEXT #{at}" : "EXP #{exp}   NEXT AT #{at}", DIM)
+        l.call(2.5, nil, nil, [exp, at, [110, 190, 255]])
+      end
     end
   end
 

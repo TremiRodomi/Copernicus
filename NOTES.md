@@ -163,8 +163,9 @@ boot.
   the enemies below. Combos: 2 = 2000 ... 7 = 64000 points; 3 or more drop a bonus coin. Coins pay their value x the
   pickup streak.
 - **EXP / levels:** an EXP bracket picks the odds row of the item table (6 tiers x 3 enemy-count groups = 18 items).
-  Levels 1-8 (Holy Water: 9) set the power-up length. A new life sets EXP = round - 1. A Wraith kill costs a level
-  (pass 8b, 16).
+  Levels 1-8 (Holy Water: 9) set the power-up length. A new life sets EXP = round - 1 and the threshold back to $1d
+  but keeps the level, so late rounds level up on each gain until it catches up; a Wraith kill costs a level
+  (pass 8b, 16, 61).
 - **Bonus item:** after 800 px of walking, it appears at the round's item spot for 150 x 6 frames (pass 23 lists all
   18 handlers).
 - **Timer:** hurry-up at $41 (enemies full speed). Horned appears at $46 with 2+ enemies left (invincible; follows a
@@ -193,7 +194,8 @@ boot.
   it to wait for a jingle). $21 is a looping PCM sample with a lock; $01 cancels it.
 - The full catalogue is in `sound_commands.csv` (69 call sites, owning task, trigger, confidence).
 - **Port** (`app/audio/audio.rb`, `audio/<set>/`): `<cmd hex> <name>.ogg` effects; `music/tracks.txt` maps commands to
-  tracks (intro + loop files, `lengths.txt` in samples). Behaviours reproduced:
+  tracks (intro + loop files, `lengths.txt` in samples). The set's music is pre-decoded silently at boot / on a set
+  change (Audio.warm: DragonRuby decodes a file in full on its first play - a 60 ms hitch; pass 61). Behaviours reproduced:
   - mute / unmute;
   - the $21 loop;
   - "music busy" waits;
@@ -228,9 +230,9 @@ The X68000 replaces 2-5 with plain 68000 code (no vault) and hard-codes the same
 - `app/game/`: `world.rb` (one round's state, named after the original variables), `scheduler.rb`, `round_builder.rb`,
   `tasks/*.rb` (one file per original task family), `score.rb`, `text.rb`, `save.rb` (save.txt), `settings.rb`
   (settings.txt), `controls.rb` (keyboard + pads, rebinding), `pause.rb`.
-- `app/gfx/`: `palette.rb`, `screen.rb` (BG pixel array + priority layer), `sprites.rb` (texture cache per pattern x
+- `app/gfx/`: `palette.rb`, `screen.rb` (BG pixel array + priority layer, decoded cells cached per setup), `sprites.rb` (texture cache per pattern x
   palette), `display.rb` (scaling, aspect, smoothing, scanlines / mask / vignette, borders, HD render targets),
-  `widgets.rb` (corner info panels; preview on the WIDGETS page, fades: pass 57).
+  `widgets.rb` (corner info panels; preview on the WIDGETS page, fades: pass 57; whole-texel font: pass 61).
 - `app/main.rb`: the tick loop, scenes, CLI flags (dev only; release builds read only `--source`).
 - Rules:
   - game logic is separate from rendering;
